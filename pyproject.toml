@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "zkteco"
+version = "0.1.0"
+description = "A Python application to connect to ZKTeco devices"
+authors = []
+
+[tool.poetry.dependencies]
+python = "~3.8"
+pyzkaccess = "1.1"
+python-dotenv = "^1.0"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"

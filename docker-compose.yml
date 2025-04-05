@@ -1,0 +1,7 @@
+services:
+  zkaccess:
+    build:
+      context: . 
+    platform: linux/amd64
+    container_name: zkaccess
+    restart: 'no'
