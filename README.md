@@ -48,7 +48,7 @@ docker-compose up -d
 
 ## Configuration
 
-All configuration is done through environment variables, which can be set in the `.env` file. Below is a description of all available configuration options:
+All configuration is done through environment variables, which can be set in the `.env` file or passed as environment variables to the container. Below is a description of all available configuration options:
 
 ### ZKTeco Device Connection
 
