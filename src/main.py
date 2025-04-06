@@ -1,47 +1,83 @@
-import os
+import signal
 import sys
+import time
 import logging
-from pyzkaccess import ZKAccess
-from dotenv import load_dotenv, find_dotenv
+import schedule
 
-env = find_dotenv(raise_error_if_not_found=True)
-print(env)
-load_dotenv(env)
+import settings
+import mqtt_handler
+import ha_discovery
+import zk_handler
+from scheduler import polling_job
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+log_level_name = settings.LOG_LEVEL
+numeric_level = getattr(logging, log_level_name, logging.INFO)
+logging.basicConfig(level=numeric_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+log = logging.getLogger(__name__)
 
-DEVICE_IP = os.getenv('DEVICE_IP')
-DEVICE_PORT = int(os.getenv('DEVICE_PORT', 4370))
-DEVICE_TIMEOUT = int(os.getenv('DEVICE_TIMEOUT', 4000))
-DEVICE_PASSWORD = os.getenv('DEVICE_PASSWORD', '')
+shutdown_requested = False
 
-conn = None
-
-try:
-    logging.info(f"Attempting to connect to device at {DEVICE_IP}:{DEVICE_PORT} using pyzkaccess...")
-    # Consult pyzkaccess docs for exact connection syntax
-    # This is a guess based on typical patterns - ADJUST AS NEEDED
-    zk = ZKAccess(
-        connstr=f'protocol=TCP,ipaddress={DEVICE_IP},port={DEVICE_PORT},timeout={DEVICE_TIMEOUT},passwd={DEVICE_PASSWORD}',
-    ) # Check password format
-
-    logging.info("Connection object created (actual connection may happen on first command).")
-
-    logging.info(f"Device SN: {zk.parameters.serial_number}, IP: {zk.parameters.ip_address}")
-
-    users = zk.table('User')
-    if users:
-        # Process users
-        for user in users[:5]:
-            logging.info(f" User: {user}") # Adjust based on actual user object structure
+def handle_signal(signum):
+    global shutdown_requested
+    if not shutdown_requested:
+        log.info(f"Received signal {signum}. Initiating graceful shutdown...")
+        shutdown_requested = True
     else:
-        logging.info("No users found or failed to retrieve.")
+        log.info("Shutdown already in progress.")
 
-except Exception as e:
-    logging.error(f"Error connecting or communicating with device: {e}", exc_info=True)
-    sys.exit(1) # Exit with error code
-finally:
-    if conn: # Or however pyzkaccess handles explicit disconnect if needed
-        logging.info("Disconnecting (if applicable).")
-        # zk.disconnect() # Check pyzkaccess docs for disconnect method
-    logging.info("Script finished.")
+def main():
+    log.info("=========================================")
+    log.info(" Starting ZKTeco to MQTT Bridge Service")
+    log.info("=========================================")
+
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
+    device = zk_handler.get_device_definition()
+    if not device:
+        log.critical("Fatal: Failed to retrieve device information. Exiting.")
+        sys.exit(1)
+
+    mqtt_client = mqtt_handler.setup_mqtt_client(f"zkteco_bridge_{device.parameters.serial_number}")
+    if not mqtt_client:
+        log.critical("Fatal: Failed to initialize MQTT client. Exiting.")
+        sys.exit(1)
+
+    mqtt_client.loop_start()
+    log.info("MQTT client loop started.")
+
+    log.info("Waiting for MQTT connection...")
+    connection_timeout_seconds = 15
+    wait_start_time = time.monotonic()
+    while not mqtt_client.is_connected():
+        if shutdown_requested:
+            log.warning("Shutdown requested while waiting for MQTT connection.")
+            mqtt_client.loop_stop()
+            sys.exit(1)
+        if time.monotonic() - wait_start_time > connection_timeout_seconds:
+            log.critical(f"Fatal: Could not connect to MQTT broker after {connection_timeout_seconds} seconds. Exiting.")
+            mqtt_client.loop_stop()
+            sys.exit(1)
+        time.sleep(0.5)
+
+    log.info("MQTT Connected.")
+
+    ha_discovery.publish_discovery_messages(mqtt_client)
+
+    schedule.every(settings.POLLING_INTERVAL_SECONDS).seconds.do(polling_job, mqtt_client=mqtt_client, device=device)
+
+    while not shutdown_requested:
+        schedule.run_pending()
+        time.sleep(min(1.0, schedule.idle_seconds() if schedule.next_run else 1.0))
+
+    log.info("Scheduler loop exited. Cleaning up...")
+    schedule.clear()
+
+    mqtt_client.loop_stop()
+    mqtt_client.disconnect()
+    log.info("Application stopped gracefully.")
+    log.info("=========================================")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
