@@ -1,5 +1,6 @@
 import logging
 import paho.mqtt.client as mqtt
+from typing import Optional
 
 import settings
 
@@ -19,7 +20,6 @@ def on_disconnect(client, userdata, rc, properties=None):
 
 def on_publish(client, userdata, mid, properties=None, reason_codes=None):
     log.debug(f"Published message ID: {mid}")
-    pass
 
 def setup_mqtt_client(client_id: str) -> Optional[mqtt.Client]:
     log.info("Setting up MQTT client...")
@@ -41,8 +41,8 @@ def setup_mqtt_client(client_id: str) -> Optional[mqtt.Client]:
             log.exception(f"Error setting MQTT username/password: {e}", exc_info=True)
             return None
 
-    # TODO: Add TLS configuration via environment variables if needed
-    
+    # TODO: Add TLS configuration via settings if needed
+
     try:
         log.info(f"Connecting to MQTT broker at {settings.MQTT_BROKER_HOST}:{settings.MQTT_BROKER_PORT}...")
         client.connect_async(settings.MQTT_BROKER_HOST, settings.MQTT_BROKER_PORT, keepalive=60)
@@ -62,8 +62,9 @@ def publish_message(client: mqtt.Client, topic: str, payload: str, qos: int = 1,
 
     try:
         result = client.publish(topic, payload, qos=qos, retain=retain)
-
         if result.rc == mqtt.MQTT_ERR_SUCCESS:
+            log.info(f"-> Published to {topic} (Retain={retain}, QoS={qos})")
+            log.debug(f"   Payload: {payload}")
             return True
         else:
             log.error(f"-> Failed to queue message for {topic} (Error code: {result.rc})")

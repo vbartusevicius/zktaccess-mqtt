@@ -20,7 +20,6 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
 HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "homeassistant")
 
-
-HA_DEVICE_NAME = os.getenv("HA_DEVICE_NAME", f"ZKTeco Controller {ZKT_DEVICE_IP}")
+HA_DEVICE_NAME = os.getenv("HA_DEVICE_NAME", f"ZKTeco {ZKT_DEVICE_MODEL} Controller {ZKT_DEVICE_IP}")
 HA_DEVICE_MANUFACTURER = os.getenv("HA_DEVICE_MANUFACTURER", "ZKTeco")
-HA_DEVICE_SW_VERSION = os.getenv("HA_DEVICE_SW_VERSION", "zk_mqtt_bridge_1.0")
+HA_DEVICE_SW_VERSION = os.getenv("HA_DEVICE_SW_VERSION", "zkt_mqtt_bridge_1.0")
