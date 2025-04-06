@@ -12,14 +12,13 @@ MQTT_BROKER_PORT = int(os.getenv("MQTT_BROKER_PORT", 1883))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", None)
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", None)
 
-MQTT_GENERAL_EVENT_TOPIC = os.getenv("MQTT_GENERAL_EVENT_TOPIC", None)
-
 # --- Application Settings ---
 POLLING_INTERVAL_SECONDS = int(os.getenv("POLLING_INTERVAL_SECONDS", 60))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
 HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "homeassistant")
 
-HA_DEVICE_NAME = os.getenv("HA_DEVICE_NAME", f"ZKTeco {ZKT_DEVICE_MODEL} Controller {ZKT_DEVICE_IP}")
+HA_DEVICE_NAME = os.getenv("HA_DEVICE_NAME", f"ZKTeco {ZKT_DEVICE_MODEL} Controller")
 HA_DEVICE_MANUFACTURER = os.getenv("HA_DEVICE_MANUFACTURER", "ZKTeco")
 HA_DEVICE_SW_VERSION = os.getenv("HA_DEVICE_SW_VERSION", "zkt_mqtt_bridge_1.0")
+TIME_ZONE = os.getenv("TIME_ZONE", "UTC")
