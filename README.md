@@ -20,14 +20,48 @@ A Python application that connects to ZKTeco access control devices and publishe
 
 ## Installation
 
-### Using Docker (Recommended)
+### Using Docker Compose (Recommended)
+
+```yaml
+services:
+  zktaccess:
+    image: valentas/zkteco-mqtt-gateway:latest
+    platform: linux/amd64
+    container_name: zktaccess
+    environment:
+      - DEVICE_IP=192.168.1.201
+      - DEVICE_PORT=4370
+    #   - DEVICE_PASSWORD=
+    #   - DEVICE_TIMEOUT=4000
+    #   - DEVICE_MODEL=ZK100
+    #   - MQTT_BROKER_HOST=localhost
+    #   - MQTT_BROKER_PORT=1883
+    #   - MQTT_USERNAME=
+    #   - MQTT_PASSWORD=
+    #   - MQTT_CLIENT_ID=
+    #   - POLLING_INTERVAL_SECONDS=60
+    #   - LOG_LEVEL=INFO
+    #   - TIME_ZONE=UTC
+    #   - HA_DISCOVERY_PREFIX=homeassistant
+    #   - HA_DEVICE_IDENTIFIER=
+    #   - HA_DEVICE_NAME=
+    #   - HA_DEVICE_MANUFACTURER=ZKTeco
+    #   - HA_DEVICE_SW_VERSION=zk_mqtt_bridge_1.0
+```
+
+```bash
+docker compose up
+```
+
+
+### Building yourself
 
 1. Clone this repository
 2. Copy `dist.env` to `.env` and configure your settings
 3. Build and run with Docker Compose:
 
 ```bash
-docker-compose up -d
+docker compose up --build
 ```
 
 > **IMPORTANT NOTE FOR ARM DEVICES (Apple Silicon, Raspberry Pi, etc.):**  
