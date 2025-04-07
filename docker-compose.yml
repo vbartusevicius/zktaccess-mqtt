@@ -5,3 +5,9 @@ services:
     platform: linux/amd64
     container_name: zktaccess
     restart: 'no'
+    volumes:
+      - ./.env:/app/.env
+      - ./pyproject.toml:/app/pyproject.toml
+      - ./src:/app/src
+      - ./tests:/app/tests
+

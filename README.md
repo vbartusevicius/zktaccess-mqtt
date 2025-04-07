@@ -84,12 +84,12 @@ docker compose up --build
 
 All configuration is done through environment variables, which can be set in the `.env` file or passed as environment variables to the container. Below is a description of all available configuration options:
 
-### ZKTeco Device Connection
+### ZKAccess Device Connection
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DEVICE_IP` | **(Required)** IP Address of your ZKTeco controller | - |
-| `DEVICE_PORT` | Port for the ZKTeco device | `4370` |
+| `DEVICE_IP` | **(Required)** IP Address of your ZKAccess controller | - |
+| `DEVICE_PORT` | Port for the ZKAccess device | `4370` |
 | `DEVICE_PASSWORD` | Communication Password (if set) | empty |
 | `DEVICE_TIMEOUT` | Communication timeout in milliseconds | `4000` |
 | `DEVICE_MODEL` | Device model (ZK100, ZK200, ZK400) | `ZK100` |
@@ -142,11 +142,17 @@ All MQTT messages use the following topic structure:
 zkt_eco/[MODEL]/[SERIAL_NUMBER]/[ENTITY]/state
 ```
 
+## Running tests
+
+```bash
+docker compose run --rm zktaccess wine poetry run pytest
+```
+
 ## Troubleshooting
 
 ### Connection Issues
 
-- Ensure the ZKTeco device is powered on and accessible on the network
+- Ensure the ZKAccess device is powered on and accessible on the network
 - Verify the IP address, port, and password are correct
 - Check firewall settings to ensure port 4370 TCP is open
 - Set `LOG_LEVEL=DEBUG` for more detailed logs
