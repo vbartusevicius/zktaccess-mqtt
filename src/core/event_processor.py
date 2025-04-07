@@ -1,14 +1,14 @@
 import logging
 import datetime
 import pytz
-from typing import Optional
+from typing import Optional, List
 
 from pyzkaccess.event import Event
 from pyzkaccess.enums import EVENT_TYPES, RelayGroup
 
 import settings
-from models import ProcessedEvent, EventType, EntityState
-from utils import safe_get_nested_attr
+from core.models import ProcessedEvent, EventType, EntityState
+from core.utils import safe_get_nested_attr
 
 log = logging.getLogger(__name__)
 
@@ -142,7 +142,7 @@ def determine_aux_input_state(event: ProcessedEvent) -> Optional[str]:
         return "OFF"
     return None
 
-def get_related_entity_states(event: ProcessedEvent):
+def get_related_entity_states(event: ProcessedEvent) -> List[EntityState]:
     states = []
     
     door_state = determine_door_state(event)

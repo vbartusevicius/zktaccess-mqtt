@@ -3,8 +3,8 @@ import logging
 from typing import Any
 
 import settings
-import mqtt_handler
-from zkt_handler import DeviceDefinition
+from mqtt import handler as mqtt_handler
+from core.models import DeviceDefinition
 
 log = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional
 
-from models import DeviceDefinition, EntityState
+from core.models import DeviceDefinition, EntityState
 
 log = logging.getLogger(__name__)
 

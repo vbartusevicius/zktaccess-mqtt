@@ -9,12 +9,12 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(raise_error_if_not_found=True))
 
 import settings
-import mqtt_handler
-import ha_discovery
-import zkt_handler
-from scheduler import JobScheduler
-from mqtt_publisher import MQTTPublisher
-from models import DeviceDefinition
+from zkt import handler as zkt_handler
+from mqtt import handler as mqtt_handler
+from ha_integration import discovery as ha_discovery
+from scheduler.jobs import JobScheduler
+from mqtt.publisher import MQTTPublisher
+from core.models import DeviceDefinition
 
 numeric_level = getattr(logging, settings.LOG_LEVEL)
 logging.basicConfig(level=numeric_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

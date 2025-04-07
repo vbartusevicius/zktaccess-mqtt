@@ -2,9 +2,9 @@ import json
 import logging
 from typing import Dict, Any, List, Optional
 
-import mqtt_handler
-import ha_discovery
-from models import ProcessedEvent, EntityState
+from mqtt import handler as mqtt_handler
+from ha_integration import discovery as ha_discovery
+from core.models import ProcessedEvent, EntityState
 
 log = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
 import logging
 
-import zkt_handler
-from event_processor import process_event, get_related_entity_states
-from mqtt_publisher import MQTTPublisher
-from state_manager import state_manager
+from zkt import handler as zkt_handler
+from core.event_processor import process_event, get_related_entity_states
+from mqtt.publisher import MQTTPublisher
+from core.state_manager import state_manager
 
 log = logging.getLogger(__name__)
 

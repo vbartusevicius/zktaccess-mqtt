@@ -8,7 +8,7 @@ from pyzkaccess.exceptions import ZKSDKError
 from pyzkaccess.device import ZKDevice, ZK100, ZK200, ZK400
 
 import settings
-from models import DeviceDefinition
+from core.models import DeviceDefinition
 
 log = logging.getLogger(__name__)
 
