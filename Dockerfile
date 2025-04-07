@@ -14,11 +14,18 @@ RUN echo '#!/bin/bash\nexec "$@"' > /entrypoint.sh \
 
 WORKDIR /app
 
+ARG INSTALL_DEV=false
+
 COPY pyproject.toml .
 COPY src/ ./src/
 COPY .env .
 
-RUN wine poetry install --no-interaction --no-ansi
+# Conditionally install development dependencies
+RUN if [ "$INSTALL_DEV" = "true" ]; then \
+        wine poetry install --no-interaction --no-ansi; \
+    else \
+        wine poetry install --no-interaction --no-ansi --without dev; \
+    fi
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["wine", "poetry", "run", "python", "./src/main.py"]

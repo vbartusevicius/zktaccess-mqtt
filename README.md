@@ -148,6 +148,25 @@ zkt_eco/[MODEL]/[SERIAL_NUMBER]/[ENTITY]/state
 docker compose run --rm zktaccess wine poetry run pytest
 ```
 
+## Build options
+
+The project supports two build modes:
+
+1. **Development build** - Includes testing dependencies (default for docker-compose)
+   ```bash
+   # Using docker-compose (automatically includes dev dependencies)
+   docker compose build
+   
+   # Using Docker directly with dev dependencies
+   docker build --build-arg INSTALL_DEV=true -t zktaccess .
+   ```
+
+2. **Production build** - Minimal footprint without dev dependencies
+   ```bash
+   # Default Docker build excludes dev dependencies
+   docker build -t zktaccess .
+   ```
+
 ## Troubleshooting
 
 ### Connection Issues
