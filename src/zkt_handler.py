@@ -6,30 +6,11 @@ from pyzkaccess import ZKAccess
 from pyzkaccess.event import Event
 from pyzkaccess.exceptions import ZKSDKError
 from pyzkaccess.device import ZKDevice, ZK100, ZK200, ZK400
-from pyzkaccess.param import DeviceParameters
-from pyzkaccess.door import Door
-from pyzkaccess.reader import Reader
-from pyzkaccess.relay import Relay
-from pyzkaccess.aux_input import AuxInput
 
 import settings
+from models import DeviceDefinition
 
 log = logging.getLogger(__name__)
-
-class DeviceDefinition:
-    def __init__(
-        self,
-        parameters: Optional[DeviceParameters],
-        doors: Optional[List[Door]],
-        readers: Optional[List[Reader]],
-        relays: Optional[List[Relay]],
-        aux_inputs: Optional[List[AuxInput]]
-    ):
-        self.parameters = parameters
-        self.doors = doors or []
-        self.readers = readers or []
-        self.relays = relays or []
-        self.aux_inputs = aux_inputs or []
 
 CONNSTR = (
     f"protocol=TCP,ipaddress={settings.ZKT_DEVICE_IP},"
