@@ -8,8 +8,8 @@ RUN unzip -q pull_sdk.zip -d /sdk_temp \
     && cp /sdk_temp/SDK-Ver2.2.0.220/pl*.dll ${WINEPREFIX}/drive_c/windows/system32/ \
     && rm -rf /sdk_temp pull_sdk.zip
 
-RUN echo '#!/bin/bash\nexec "$@"' > /entrypoint.sh \
-    && chmod +x /entrypoint.sh
+COPY build/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 
 WORKDIR /app
