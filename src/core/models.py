@@ -3,12 +3,11 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional, Dict, Any, List
 
-from pyzkaccess.event import Event
-from pyzkaccess.param import DeviceParameters
-from pyzkaccess.door import Door
-from pyzkaccess.reader import Reader
-from pyzkaccess.relay import Relay
-from pyzkaccess.aux_input import AuxInput
+DeviceParameters = Dict[str, Any]
+Door = Dict[str, Any]
+Reader = Dict[str, Any]
+Relay = Dict[str, Any]
+AuxInput = Dict[str, Any]
 
 class DeviceDefinition:
     def __init__(
@@ -27,7 +26,7 @@ class DeviceDefinition:
 
     @property
     def serial_number(self) -> str:
-        return self.parameters.serial_number if self.parameters else "unknown"
+        return self.parameters.get('serial_number', "unknown")
 
 class EventType(Enum):
     CARD_SCAN_SUCCESS = "card_scan_success"
@@ -58,7 +57,7 @@ class ProcessedEvent:
     entry_exit: Optional[str] = None 
     zk_event_code: Optional[int] = None
     zk_event_desc: Optional[str] = None
-    raw_event: Optional[Event] = None
+    raw_event: Optional[Any] = None
     additional_attributes: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass

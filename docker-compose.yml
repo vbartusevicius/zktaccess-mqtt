@@ -4,7 +4,6 @@ services:
       context: .
       args:
         INSTALL_DEV: "true"
-    platform: linux/amd64
     container_name: zktaccess
     restart: 'no'
     volumes:

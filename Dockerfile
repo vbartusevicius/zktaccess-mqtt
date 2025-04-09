@@ -1,16 +1,15 @@
-FROM tobix/pywine:3.8
+FROM python:3.12-slim
 
-RUN wine python -m pip install --no-cache-dir poetry==1.6.1 \
-    && wine poetry config virtualenvs.create false
-
-COPY build/pull_sdk.zip .
-RUN unzip -q pull_sdk.zip -d /sdk_temp \
-    && cp /sdk_temp/SDK-Ver2.2.0.220/pl*.dll ${WINEPREFIX}/drive_c/windows/system32/ \
-    && rm -rf /sdk_temp pull_sdk.zip
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       curl \
+       unzip \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir poetry==1.6.1 \
+    && poetry config virtualenvs.create false
 
 COPY build/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
 
 WORKDIR /app
 
@@ -20,12 +19,11 @@ COPY pyproject.toml .
 COPY src/ ./src/
 COPY .env .
 
-# Conditionally install development dependencies
 RUN if [ "$INSTALL_DEV" = "true" ]; then \
-        wine poetry install --no-interaction --no-ansi; \
+        poetry install --no-interaction --no-ansi; \
     else \
-        wine poetry install --no-interaction --no-ansi --without dev; \
+        poetry install --no-interaction --no-ansi --without dev; \
     fi
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["wine", "poetry", "run", "python", "./src/main.py"]
+CMD ["poetry", "run", "python", "./src/main.py"]

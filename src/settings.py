@@ -3,8 +3,7 @@ import os
 ZKT_DEVICE_IP = os.getenv("DEVICE_IP", "192.168.1.201")
 ZKT_DEVICE_PORT = int(os.getenv("DEVICE_PORT", 4370))
 ZKT_DEVICE_PASSWORD = os.getenv("DEVICE_PASSWORD", "")
-ZKT_INTERNAL_TIMEOUT = int(os.getenv("DEVICE_TIMEOUT", 4000))
-ZKT_DEVICE_MODEL = os.getenv("DEVICE_MODEL", "Unknown")
+ZKT_DEVICE_MODEL = os.getenv("DEVICE_MODEL", "C3")
 
 # --- MQTT Broker Settings ---
 MQTT_BROKER_HOST = os.getenv("MQTT_BROKER_HOST", "localhost")

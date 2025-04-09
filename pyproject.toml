@@ -5,8 +5,8 @@ description = "A Python application to connect to ZKTeco devices"
 authors = []
 
 [tool.poetry.dependencies]
-python = "~3.8"
-pyzkaccess = "1.1"
+python = ">=3.10"
+zkaccess-c3 = "^0.0.14"
 python-dotenv = "^1.0"
 paho-mqtt = "^2.1"
 schedule = "^1.2"

@@ -13,7 +13,7 @@ def safe_get_attr(obj: Any, attr_name: str, default: Any = None) -> Any:
 
 def get_device_info(device_definition: DeviceDefinition) -> dict:
     info = {
-        "identifiers": [device_definition.parameters.serial_number],
+        "identifiers": [device_definition.serial_number],
         "name": settings.HA_DEVICE_NAME,
         "manufacturer": settings.HA_DEVICE_MANUFACTURER,
         "model": settings.ZKT_DEVICE_MODEL,
@@ -35,7 +35,7 @@ def publish_discovery_messages(
     device_definition: DeviceDefinition,
     ha_identifier: str
 ):
-    serial_number = device_definition.parameters.serial_number
+    serial_number = device_definition.serial_number
 
     discovery_prefix = settings.HA_DISCOVERY_PREFIX
     device_info = get_device_info(device_definition)
@@ -43,8 +43,9 @@ def publish_discovery_messages(
 
     for door in device_definition.doors:
         try:
-            door_id = int(safe_get_attr(door, 'number', -1))
-            if door_id < 0: raise ValueError("Missing/invalid door number")
+            door_id = int(door['number'])
+            if door_id < 0:
+                raise ValueError("Missing/invalid door number")
             door_name = f"Door {door_id}"
             unique_id = f"{ha_identifier}_door_{door_id}"
             object_id = f"door_{door_id}"
@@ -69,8 +70,8 @@ def publish_discovery_messages(
 
     for reader in device_definition.readers:
         try:
-            reader_id = int(safe_get_attr(reader, 'number', -1))
-            if reader_id < 0: 
+            reader_id = int(reader['number'])
+            if reader_id < 0:
                 raise ValueError("Missing/invalid reader number")
             reader_name = f"Reader {reader_id}"
             
@@ -123,11 +124,13 @@ def publish_discovery_messages(
 
     for relay in device_definition.relays:
         try:
-            relay_num = int(safe_get_attr(relay, 'number', -1))
-            relay_group_enum = safe_get_attr(relay, 'group')
-            if relay_num < 0 or not relay_group_enum: 
-                raise ValueError("Missing/invalid relay number or group")
-            relay_group_name = safe_get_attr(relay_group_enum, 'name', 'unknown').lower() # 'lock' or 'aux'
+            relay_num = int(relay['number'])
+            
+            # For simplicity, assume all relays are in the 'lock' group for now
+            relay_group_name = "lock"
+            
+            if relay_num < 0: 
+                raise ValueError("Missing/invalid relay number")
             unique_id = f"{ha_identifier}_relay_{relay_group_name}_{relay_num}"
             object_id = f"relay_{relay_group_name}_{relay_num}"
             entity_name = f"Relay {relay_group_name.capitalize()} {relay_num}"
@@ -153,8 +156,9 @@ def publish_discovery_messages(
 
     for aux_input in device_definition.aux_inputs:
         try:
-            aux_id = int(safe_get_attr(aux_input, 'number', -1))
-            if aux_id < 0: raise ValueError("Missing or invalid aux input number")
+            aux_id = int(aux_input['number'])
+            if aux_id < 0:
+                raise ValueError("Missing or invalid aux input number")
             aux_name = f"Aux Input {aux_id}"
 
             unique_id = f"{ha_identifier}_aux_input_{aux_id}"

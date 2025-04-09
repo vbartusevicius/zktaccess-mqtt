@@ -20,28 +20,34 @@ class StateManager:
         states = []
         
         for door in device_definition.doors:
-            entity_id = f"door_{door.number}"
-            # If lock_driver_time is 255, door is considered unlocked (ON)
-            state = "ON" if door.parameters.lock_driver_time == 255 else "OFF"
+            door_number = door['number']
+            entity_id = f"door_{door_number}"
+            # Default to OFF since we don't have reliable lock driver time info now
+            state = "OFF"
             self.update_state(entity_id, state)
             states.append(EntityState(entity_id=entity_id, state=state))
         
         for aux_input in device_definition.aux_inputs:
-            entity_id = f"aux_input_{aux_input.number}"
+            aux_number = aux_input['number']
+            entity_id = f"aux_input_{aux_number}"
             # Default to OFF since we don't have initial state
             state = "OFF"
             self.update_state(entity_id, state)
             states.append(EntityState(entity_id=entity_id, state=state))
         
         for relay in device_definition.relays:
-            entity_id = f"relay_{relay.group.name}_{relay.number}"
+            relay_number = relay['number']
+            # For simplicity, assume all relays are in the 'lock' group for now
+            relay_group = "lock"
+            entity_id = f"relay_{relay_group}_{relay_number}"
             # Default to OFF since we don't have initial state
             state = "OFF"
             self.update_state(entity_id, state)
             states.append(EntityState(entity_id=entity_id, state=state))
         
         for reader in device_definition.readers:
-            entity_id = f"reader_{reader.number}_card"
+            reader_number = reader['number']
+            entity_id = f"reader_{reader_number}_card"
             # Default card state is empty
             state = '{ "card_id": "0" }'
             self.update_state(entity_id, state)
