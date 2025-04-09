@@ -1,20 +1,19 @@
 # ZKTeco MQTT Bridge
 
-A Python application that connects to ZKTeco access control devices and publishes their events to MQTT, with built-in Home Assistant integration through MQTT Discovery.
+A Python application that connects to ZKTeco access control devices (C3-series) and publishes their events to MQTT, with built-in Home Assistant integration through MQTT Discovery.
 
 ## Features
 
-- 🔌 Connects to ZKTeco devices (C3 and C4 series)
+- 🔌 Connects to ZKTeco C3-series access control devices
 - 📊 Publishes device events to MQTT
 - 🏠 Home Assistant auto-discovery for easy integration
 - 🚪 Monitor doors, relays, aux inputs, card readers
-- ⏰ Time synchronization with the device
 - 🔄 Configurable polling interval
 - 🌐 Timezone support for event timestamps
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.10+
 - MQTT Broker (like Mosquitto)
 - ZKTeco access control system
 
@@ -32,8 +31,6 @@ services:
       - DEVICE_IP=192.168.1.201
       - DEVICE_PORT=4370
     #   - DEVICE_PASSWORD=
-    #   - DEVICE_TIMEOUT=4000
-    #   - DEVICE_MODEL=ZK100
     #   - MQTT_BROKER_HOST=localhost
     #   - MQTT_BROKER_PORT=1883
     #   - MQTT_USERNAME=
@@ -64,21 +61,6 @@ docker compose up
 docker compose up --build
 ```
 
-> **IMPORTANT NOTE FOR ARM DEVICES (Apple Silicon, Raspberry Pi, etc.):**  
-> The ZKTeco SDK requires Windows. It successfully works on Docker and Wine. When building on ARM devices:
-> 
-> **Option 1:** Build with platform flag:
-> ```bash
-> docker build --platform=linux/amd64 -t zkteco-mqtt .
-> ```
-> 
-> **Option 2:** With docker-compose, you may need to disable BuildKit:
-> ```bash
-> DOCKER_BUILDKIT=0 COMPOSE_DOCKER_CLI_BUILD=0 docker-compose up -d
-> ```
-> 
-> These settings ensure the image builds correctly for the x86_64 architecture required by the ZKTeco SDK.
-
 
 ## Configuration
 
@@ -91,8 +73,7 @@ All configuration is done through environment variables, which can be set in the
 | `DEVICE_IP` | **(Required)** IP Address of your ZKAccess controller | - |
 | `DEVICE_PORT` | Port for the ZKAccess device | `4370` |
 | `DEVICE_PASSWORD` | Communication Password (if set) | empty |
-| `DEVICE_TIMEOUT` | Communication timeout in milliseconds | `4000` |
-| `DEVICE_MODEL` | Device model (ZK100, ZK200, ZK400) | `ZK100` |
+| `DEVICE_MODEL` | Device Model - Defaults to C3 if unset or invalid. | `C3` |
 
 ### MQTT Broker Connection
 
@@ -139,13 +120,18 @@ All entities are grouped under a single device for easy management and automatio
 All MQTT messages use the following topic structure:
 
 ```
-zkt_eco/[MODEL]/[SERIAL_NUMBER]/[ENTITY]/state
+zkt_eco/[MODEL_NAME]/[SERIAL_NUMBER]/[ENTITY]/state
 ```
+
+Where:
+- MODEL_NAME: The configured device model (default: "C3")
+- SERIAL_NUMBER: The device's serial number
+- ENTITY: Entity type and ID (e.g., door_1, reader_2_card)
 
 ## Running tests
 
 ```bash
-docker compose run --rm zktaccess wine poetry run pytest
+docker compose run --rm zktaccess poetry run pytest
 ```
 
 ## Build options
@@ -188,5 +174,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Built using the pyzkaccess library for ZKTeco device communication
+- Built using the zkaccess-c3 library for ZKTeco C3-series device communication
 - Inspired by other ZKTeco integration projects

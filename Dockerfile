@@ -1,15 +1,6 @@
-FROM python:3.12-slim
+FROM sunpeek/poetry:py3.11-slim as build
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       curl \
-       unzip \
-    && rm -rf /var/lib/apt/lists/* \
-    && pip install --no-cache-dir poetry==1.6.1 \
-    && poetry config virtualenvs.create false
-
-COPY build/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN poetry config virtualenvs.create false
 
 WORKDIR /app
 
@@ -25,5 +16,4 @@ RUN if [ "$INSTALL_DEV" = "true" ]; then \
         poetry install --no-interaction --no-ansi --without dev; \
     fi
 
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["poetry", "run", "python", "./src/main.py"]
