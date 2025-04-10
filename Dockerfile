@@ -1,4 +1,4 @@
-FROM sunpeek/poetry:py3.11-slim as build
+FROM sunpeek/poetry:py3.11-slim AS build
 
 RUN poetry config virtualenvs.create false
 

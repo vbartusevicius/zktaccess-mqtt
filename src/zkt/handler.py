@@ -55,22 +55,20 @@ def ensure_connection() -> bool:
             log.info("Successfully connected to ZKTeco device")
             return True
         else:
-            log.error("Failed to connect to ZKTeco device")
             panel = None
-            return False
+            raise Exception("Failed to connect to ZKTeco device")
             
     except Exception as e:
         log.exception(f"Error establishing connection to device: {e}")
         panel = None
-        return False
+        raise
 
 def get_device_definition() -> Optional[DeviceDefinition]:
     global panel
     definition: Optional[DeviceDefinition] = None
     
     try:
-        if not ensure_connection():
-            return None
+        ensure_connection()
             
         # Retrieve device parameters using C3 library
         params = [
@@ -113,7 +111,7 @@ def get_device_definition() -> Optional[DeviceDefinition]:
 
     except Exception as e: 
         log.exception(f"Unexpected error fetching device definition: {e}", exc_info=True)
-        return None
+        raise
 
 def close_zkteco_connection():
     global panel
