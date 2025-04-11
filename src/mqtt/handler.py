@@ -18,7 +18,7 @@ def on_publish(client, userdata, mid, properties=None, reason_codes=None):
     log.debug(f"Published message ID: {mid}")
 
 def setup_mqtt_client(client_id: str) -> Optional[mqtt.Client]:
-    log.info("Setting up MQTT client...")
+    log.info(f"Setting up MQTT client at {settings.MQTT_BROKER_HOST}:{settings.MQTT_BROKER_PORT}...")
     try:
         client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=client_id)
     except Exception as e:
