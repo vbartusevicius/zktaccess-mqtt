@@ -1,0 +1,5 @@
+-r requirements.txt
+
+pytest==7.3.1
+pytest-mock==3.10.0
+jsonschema==4.17.3

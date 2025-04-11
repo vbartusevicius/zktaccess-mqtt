@@ -131,7 +131,7 @@ Where:
 ## Running tests
 
 ```bash
-docker compose run --rm zktaccess poetry run pytest
+docker compose run --rm zktaccess pytest
 ```
 
 ## Build options

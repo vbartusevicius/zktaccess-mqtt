@@ -1,19 +1,16 @@
-FROM sunpeek/poetry:py3.11-slim AS build
-
-RUN poetry config virtualenvs.create false
+FROM python:3.12-slim AS build
 
 WORKDIR /app
 
 ARG INSTALL_DEV=false
 
-COPY pyproject.toml .
+COPY requirements.txt .
+COPY requirements-dev.txt .
 COPY src/ ./src/
 COPY .env .
 
-RUN if [ "$INSTALL_DEV" = "true" ]; then \
-        poetry install --no-interaction --no-ansi; \
-    else \
-        poetry install --no-interaction --no-ansi --without dev; \
-    fi
+# Install dependencies with optimized settings and increased verbosity
+RUN pip install --no-cache-dir --verbose --timeout 300 \
+    $(if [ "$INSTALL_DEV" = "true" ]; then echo "-r requirements-dev.txt"; else echo "-r requirements.txt"; fi)
 
-CMD ["poetry", "run", "python", "./src/main.py"]
+CMD ["python", "./src/main.py"]
