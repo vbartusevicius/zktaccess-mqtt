@@ -7,6 +7,7 @@ from mqtt import handler as mqtt_handler
 from core.models import DeviceDefinition
 
 log = logging.getLogger(__name__)
+expire_time = 3 * 24 * 60 * 60 # expire after 3 days.
 
 def safe_get_attr(obj: Any, attr_name: str, default: Any = None) -> Any:
     return getattr(obj, attr_name, default) if obj else default
@@ -59,7 +60,8 @@ def publish_discovery_messages(
                 "payload_on": "ON", 
                 "payload_off": "OFF",
                 "device": device_info, 
-                "qos": 1 
+                "qos": 1,
+                "expire_after": expire_time
             }
             config_topic = autoconfig_component_topic.format(component='binary_sensor') + f"/{object_id}/config"
             payload_json = json.dumps(config_payload)
@@ -96,7 +98,8 @@ def publish_discovery_messages(
                     "door_close", 
                     "other" 
                 ], 
-                "qos": 1 
+                "qos": 1,
+                "expire_after": expire_time
             }
 
             object_id = f"reader_{reader_id}_card"
@@ -108,7 +111,8 @@ def publish_discovery_messages(
                 "value_template": "{{ value_json.card_id }}",
                 "icon": "mdi:card-account-details",
                 "json_attributes_topic": build_state_topic(object_id, serial_number),
-                "qos": 1 
+                "qos": 1,
+                "expire_after": expire_time
             }
             scan_config_topic = autoconfig_component_topic.format(component='event') + f"/{object_id}/config"
             scan_payload_json = json.dumps(config_payload_scan)
@@ -144,7 +148,8 @@ def publish_discovery_messages(
                 "payload_off": "OFF",
                 "device": device_info,
                 "qos": 1,
-                "icon": "mdi:electric-switch" if relay_group_name == 'lock' else "mdi:electric-switch-closed"
+                "icon": "mdi:electric-switch" if relay_group_name == 'lock' else "mdi:electric-switch-closed",
+                "expire_after": expire_time
             }
             config_topic = f"{autoconfig_component_topic.format(component='binary_sensor')}/{object_id}/config"
             payload_json = json.dumps(config_payload)
@@ -172,7 +177,8 @@ def publish_discovery_messages(
                 "payload_on": "ON", 
                 "payload_off": "OFF", 
                 "device": device_info,
-                "qos": 1
+                "qos": 1,
+                "expire_after": expire_time
             }
             config_topic = f"{autoconfig_component_topic.format(component='binary_sensor')}/{object_id}/config"
             payload_json = json.dumps(config_payload)
