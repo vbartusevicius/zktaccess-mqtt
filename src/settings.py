@@ -19,5 +19,5 @@ HA_DISCOVERY_PREFIX = os.getenv("HA_DISCOVERY_PREFIX", "homeassistant")
 
 HA_DEVICE_NAME = os.getenv("HA_DEVICE_NAME", f"ZKTeco {ZKT_DEVICE_MODEL} Controller")
 HA_DEVICE_MANUFACTURER = os.getenv("HA_DEVICE_MANUFACTURER", "ZKTeco")
-HA_DEVICE_SW_VERSION = os.getenv("HA_DEVICE_SW_VERSION", "zkt_mqtt_bridge_1.0")
+HA_DEVICE_SW_VERSION = "zkt_mqtt_bridge_2.2"
 TIME_ZONE = os.getenv("TIME_ZONE", "UTC")
