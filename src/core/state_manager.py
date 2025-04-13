@@ -1,20 +1,30 @@
 import logging
 from typing import Dict, List, Optional
 
-from core.models import DeviceDefinition, EntityState
+from core.models import DeviceDefinition, EntityState, ProcessedEvent
 
 log = logging.getLogger(__name__)
 
 class StateManager:
     def __init__(self):
         self.entity_states: Dict[str, str] = {}
+        self.last_event: Optional[ProcessedEvent] = None
     
     def update_state(self, entity_id: str, state: str):
         self.entity_states[entity_id] = state
         log.debug(f"Updated state: {entity_id} -> {state}")
+
+    def update_last_event(self, event: ProcessedEvent):
+        self.last_event = event
     
     def get_state(self, entity_id: str) -> Optional[str]:
         return self.entity_states.get(entity_id)
+
+    def get_states(self) -> Dict[str, str]:
+        return self.entity_states
+
+    def get_last_event(self) -> Optional[ProcessedEvent]:
+        return self.last_event
     
     def initialize_from_device(self, device_definition: DeviceDefinition) -> List[EntityState]:
         states = []

@@ -4,6 +4,8 @@ from zkt import handler as zkt_handler
 from core.event_processor import process_event, get_related_entity_states
 from mqtt.publisher import MQTTPublisher
 from core.state_manager import state_manager
+from core.models import EntityState
+from c3.rtlog import EventRecord
 
 log = logging.getLogger(__name__)
 
@@ -24,24 +26,32 @@ class JobScheduler:
             self._process_single_event(raw_event)
             
         log.info("--- Polling Job Complete ---")
-    
-    def _process_single_event(self, raw_event):
+
+    def _process_single_event(self, raw_event: EventRecord):
+        self._update_state(raw_event)
+
+        last_event = state_manager.get_last_event()
+        all_states = state_manager.get_states()
+        entity_states = [
+            EntityState(entity_id=entity_id, state=state) for entity_id, state in all_states.items()
+        ]
+
+        self.publisher.publish_entity_states(entity_states)
+        if  last_event:
+            self.publisher.publish_event(last_event)
+            self.publisher.publish_raw_event(last_event)
+
+    def _update_state(self, raw_event: EventRecord):
         try:
             processed_event = process_event(raw_event)
             if not processed_event:
                 log.warning(f"Failed to process event: {raw_event}")
                 return
-                
-            self.publisher.publish_event(processed_event)
-            self.publisher.publish_raw_event(processed_event)
-            
+
+            state_manager.update_last_event(processed_event)
             related_states = get_related_entity_states(processed_event)
             for state in related_states:
                 state_manager.update_state(state.entity_id, state.state)
-                
-            if related_states:
-                self.publisher.publish_entity_states(related_states)
-                
         except Exception as e:
             log.exception(f"Error processing event: {e}")
     
