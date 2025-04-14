@@ -71,6 +71,42 @@ class TestZKAccessToMQTT:
                     assert payload_data["card_id"] == "12345", f"Expected card ID 12345, got {payload_data['card_id']}"
                 except json.JSONDecodeError:
                     pytest.fail(f"Failed to parse reader event payload: {reader_payload}")
+            
+            # Check reader scan state
+            reader_scan_calls = [
+                call_args for call_args in mock_publish.call_args_list 
+                if "reader_1_scan/state" in call_args[0][1]
+            ]
+            assert reader_scan_calls, "No reader scan event was published"
+            
+            if reader_scan_calls:
+                reader_scan_payload = reader_scan_calls[0][0][2]  # args[0][2] is the payload
+                try:
+                    scan_payload_data = json.loads(reader_scan_payload)
+                    assert "card_id" in scan_payload_data, "Card ID missing from reader scan payload"
+                    assert scan_payload_data["card_id"] == "12345", f"Expected card ID 12345, got {scan_payload_data['card_id']}"
+                except json.JSONDecodeError:
+                    pytest.fail(f"Failed to parse reader scan payload: {reader_scan_payload}")
+            
+            # Check reader card state
+            reader_card_calls = [
+                call_args for call_args in mock_publish.call_args_list 
+                if "reader_1_card/state" in call_args[0][1]
+            ]
+            assert reader_card_calls, "No reader card state was published"
+            
+            reader_card_payload = reader_card_calls[0][0][2]  # args[0][2] is the payload
+            try:
+                card_payload_data = json.loads(reader_card_payload)
+                assert "card_id" in card_payload_data, "Card ID missing from reader card payload"
+                assert card_payload_data["card_id"] == "12345", f"Expected card ID 12345, got {card_payload_data['card_id']}"
+                
+                # Verify we have all the expected fields in the card payload
+                expected_fields = ["event_type", "door_id", "reader_id", "timestamp", "zk_event_code", "zk_event_desc", "card_id"]
+                for field in expected_fields:
+                    assert field in card_payload_data, f"Expected field '{field}' missing from card payload"
+            except json.JSONDecodeError:
+                pytest.fail(f"Failed to parse reader card payload: {reader_card_payload}")
     
     @patch('zkt.handler.C3')
     @patch('mqtt.handler.publish_message')
