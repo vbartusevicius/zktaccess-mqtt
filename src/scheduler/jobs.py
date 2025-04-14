@@ -6,6 +6,8 @@ from mqtt.publisher import MQTTPublisher
 from core.state_manager import state_manager
 from core.models import EntityState
 from c3.rtlog import EventRecord
+from datetime import datetime
+import pytz
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +28,13 @@ class JobScheduler:
             self._process_single_event(raw_event)
             
         log.info("--- Polling Job Complete ---")
+
+    def time_update_job(self):
+        log.info("--- Updating DateTime ---")
+        now = datetime.now()
+        local_dt = now.astimezone(pytz.utc)
+
+        zkt_handler.update_time(local_dt)
 
     def _process_single_event(self, raw_event: EventRecord):
         self._update_state(raw_event)

@@ -2,6 +2,7 @@ import logging
 from typing import List, Optional
 from c3 import C3
 from c3.rtlog import EventRecord
+from datetime import datetime
 
 import settings
 from core.models import DeviceDefinition
@@ -31,6 +32,18 @@ def poll_zkteco_changes() -> Optional[List[EventRecord]]:
     except Exception as e: 
         log.exception(f"Unexpected error during ZKTeco polling: {e}", exc_info=True)
         return None
+
+def update_time(self, date_time: datetime):
+    global panel
+    try:
+        if not ensure_connection():
+            return None
+        log.debug(f"Setting device DateTime to {date_time.isoformat()}")
+        panel.set_device_datetime(date_time)
+    except Exception as e:
+        log.exception(f"Unexpected error during Setting time: {e}", exc_info=True)
+        return None
+
 
 def ensure_connection() -> bool:
     global panel

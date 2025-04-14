@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 shutdown_requested = False
 
-def handle_signal(signum): 
+def handle_signal(signum, frame):
     global shutdown_requested
     log.info(f"Received signal {signum}, initiating shutdown")
     shutdown_requested = True
@@ -72,6 +72,7 @@ def main():
         job_scheduler.initialize_states(device_definition)
         
         schedule.every(settings.POLLING_INTERVAL_SECONDS).seconds.do(job_scheduler.polling_job)
+        schedule.every(1).days.do(job_scheduler.time_update_job)
 
     log.info("Starting scheduler loop. Ctrl+C to exit.")
     while not shutdown_requested: 
