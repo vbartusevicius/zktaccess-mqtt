@@ -2,6 +2,7 @@ import logging
 import datetime
 import pytz
 from typing import Optional, List
+import json
 from c3.consts import EventType as C3EventType, VerificationMode
 
 class RelayGroup:
@@ -236,8 +237,6 @@ def get_related_entity_states(event: ProcessedEvent) -> List[EntityState]:
         ))
     
     if hasattr(event, 'reader_id') and event.reader_id is not None:
-        import json
-        
         event_payload = {
             "event_type": event.event_type.value,
             "door_id": event.door_id,
