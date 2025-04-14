@@ -235,4 +235,42 @@ def get_related_entity_states(event: ProcessedEvent) -> List[EntityState]:
             state=aux_input_state
         ))
     
+    if hasattr(event, 'reader_id') and event.reader_id is not None:
+        import json
+        
+        event_payload = {
+            "event_type": event.event_type.value,
+            "door_id": event.door_id,
+            "reader_id": event.reader_id,
+            "timestamp": event.timestamp.isoformat(),
+            "zk_event_code": event.zk_event_code,
+            "zk_event_desc": event.zk_event_desc
+        }
+        
+        if event.card_id:
+            event_payload["card_id"] = event.card_id
+        if event.pin:
+            event_payload["pin"] = event.pin
+        if event.verify_mode:
+            event_payload["verify_mode"] = event.verify_mode
+        if event.entry_exit:
+            event_payload["entry_exit"] = event.entry_exit
+        
+        for key, value in event.additional_attributes.items():
+            event_payload[key] = value
+            
+        payload_json = json.dumps({k: v for k, v in event_payload.items() if v is not None})
+        
+        # Update card state
+        states.append(EntityState(
+            entity_id=f"reader_{event.reader_id}_card",
+            state=payload_json
+        ))
+        
+        # Update scan state
+        states.append(EntityState(
+            entity_id=f"reader_{event.reader_id}_scan",
+            state=payload_json
+        ))
+    
     return states

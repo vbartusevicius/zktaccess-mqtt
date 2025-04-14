@@ -46,8 +46,7 @@ class JobScheduler:
         ]
 
         self.publisher.publish_entity_states(entity_states)
-        if  last_event:
-            self.publisher.publish_event(last_event)
+        if last_event:
             self.publisher.publish_raw_event(last_event)
 
     def _update_state(self, raw_event: EventRecord):
