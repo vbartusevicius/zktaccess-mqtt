@@ -2,5 +2,4 @@ paho-mqtt==2.1.0
 python-dotenv==1.1.0
 pytz==2025.2
 schedule==1.2.2
-git+https://github.com/vwout/zkaccess-c3-py@master
-# zkaccess-c3==0.0.14
+zkaccess-c3==0.0.15
