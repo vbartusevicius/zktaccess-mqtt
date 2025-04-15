@@ -5,6 +5,7 @@ import logging
 from typing import Optional
 import schedule
 from dotenv import load_dotenv, find_dotenv
+import uuid
 
 load_dotenv(find_dotenv(raise_error_if_not_found=True))
 
@@ -22,7 +23,7 @@ log = logging.getLogger(__name__)
 
 shutdown_requested = False
 
-def handle_signal(signum): 
+def handle_signal(signum, frame):
     global shutdown_requested
     log.info(f"Received signal {signum}, initiating shutdown")
     shutdown_requested = True
@@ -41,7 +42,7 @@ def main():
         sys.exit(1)
 
     serial_number = device_definition.serial_number
-    device_identifier = f"zkt_{serial_number}"
+    device_identifier = f"zkt_{serial_number}_{str(uuid.uuid4())[:8]}"
     
     mqtt_client = mqtt_handler.setup_mqtt_client(device_identifier)
     if not mqtt_client: 
@@ -72,6 +73,7 @@ def main():
         job_scheduler.initialize_states(device_definition)
         
         schedule.every(settings.POLLING_INTERVAL_SECONDS).seconds.do(job_scheduler.polling_job)
+        schedule.every(1).days.do(job_scheduler.time_update_job)
 
     log.info("Starting scheduler loop. Ctrl+C to exit.")
     while not shutdown_requested: 

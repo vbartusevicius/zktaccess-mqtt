@@ -2,6 +2,7 @@ import logging
 from typing import List, Optional
 from c3 import C3
 from c3.rtlog import EventRecord
+from datetime import datetime
 
 import settings
 from core.models import DeviceDefinition
@@ -31,6 +32,18 @@ def poll_zkteco_changes() -> Optional[List[EventRecord]]:
     except Exception as e: 
         log.exception(f"Unexpected error during ZKTeco polling: {e}", exc_info=True)
         return None
+
+def update_time(date_time: datetime):
+    global panel
+    try:
+        if not ensure_connection():
+            return None
+        log.debug(f"Setting device DateTime to {date_time.isoformat()}")
+        panel.set_device_datetime(date_time)
+    except Exception as e:
+        log.exception(f"Unexpected error during Setting time: {e}", exc_info=True)
+        return None
+
 
 def ensure_connection() -> bool:
     global panel
@@ -77,7 +90,7 @@ def get_device_definition() -> Optional[DeviceDefinition]:
             "ReaderCount",    # Number of readers
             "AuxInCount",     # Number of auxiliary inputs
             "AuxOutCount",    # Number of auxiliary outputs
-            "FirmVer"         # Firmware version
+            "FirmVer",        # Firmware version
         ]
         
         parameters = panel.get_device_param(params)
@@ -89,7 +102,7 @@ def get_device_definition() -> Optional[DeviceDefinition]:
         aux_in_count = int(parameters.get("AuxInCount", 0))
         aux_out_count = int(parameters.get("AuxOutCount", 0))
         firmware_version = parameters.get("FirmVer", "N/A")
-        
+
         doors = [{'number': i+1, 'name': f'Door {i+1}'} for i in range(lock_count)]
         readers = [{'number': i+1, 'name': f'Reader {i+1}'} for i in range(reader_count)]
         relays = [{'number': i+1, 'name': f'Relay {i+1}'} for i in range(aux_out_count)]
@@ -97,7 +110,7 @@ def get_device_definition() -> Optional[DeviceDefinition]:
         
         param_obj = {
             'serial_number': serial_number,
-            'firmware_version': firmware_version
+            'firmware_version': firmware_version,
         }
         
         definition = DeviceDefinition(param_obj, doors, readers, relays, aux_inputs)

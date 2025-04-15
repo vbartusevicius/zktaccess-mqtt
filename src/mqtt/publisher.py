@@ -28,47 +28,6 @@ class MQTTPublisher:
             except (TypeError, ValueError) as e: 
                 log.error(f"Failed to serialize attributes for {entity_id}: {attributes}. Err: {e}")
     
-    def publish_event(self, event: ProcessedEvent):
-        log.info(f"Publishing event: Type={event.event_type.value}, Door={event.door_id}, Reader={event.reader_id}")
-        
-        timestamp_iso = event.timestamp.isoformat()
-        
-        event_payload = {
-            "event_type": event.event_type.value,
-            "door_id": event.door_id,
-            "reader_id": event.reader_id,
-            "timestamp": timestamp_iso,
-            "zk_event_code": event.zk_event_code,
-            "zk_event_desc": event.zk_event_desc
-        }
-        
-        if event.card_id:
-            event_payload["card_id"] = event.card_id
-        if event.pin:
-            event_payload["pin"] = event.pin
-        if event.verify_mode:
-            event_payload["verify_mode"] = event.verify_mode
-        if event.entry_exit:
-            event_payload["entry_exit"] = event.entry_exit
-        
-        for key, value in event.additional_attributes.items():
-            event_payload[key] = value
-        
-        scan_object_id_event = f"reader_{event.reader_id}_scan"
-        scan_event_topic = ha_discovery.build_state_topic(scan_object_id_event, self.serial_number)
-
-        card_object_id_event = f"reader_{event.reader_id}_card"
-        card_event_topic = ha_discovery.build_state_topic(card_object_id_event, self.serial_number)
-        
-        log.info(f"    HA Reader: Publishing to {scan_event_topic} and {card_event_topic}")
-        
-        try:
-            payload_json = json.dumps({k: v for k, v in event_payload.items() if v is not None})
-            mqtt_handler.publish_message(self.mqtt_client, scan_event_topic, payload_json, qos=1, retain=False)
-            mqtt_handler.publish_message(self.mqtt_client, card_event_topic, payload_json, qos=1, retain=False)
-        except (TypeError, ValueError) as e: 
-            log.error(f"Failed to serialize event payload: {e}")
-    
     def publish_raw_event(self, event: ProcessedEvent):
         try:
             raw_payload = {
