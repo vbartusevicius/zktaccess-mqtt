@@ -42,7 +42,7 @@ def main():
         sys.exit(1)
 
     serial_number = device_definition.serial_number
-    device_identifier = f"zkt_{serial_number}_{str(uuid.uuid4())[:8]}"
+    device_identifier = f"zkt_{serial_number}"
     
     mqtt_client = mqtt_handler.setup_mqtt_client(device_identifier)
     if not mqtt_client: 
