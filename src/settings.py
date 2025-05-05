@@ -21,3 +21,4 @@ HA_DEVICE_NAME = os.getenv("HA_DEVICE_NAME", f"ZKTeco {ZKT_DEVICE_MODEL} Control
 HA_DEVICE_MANUFACTURER = os.getenv("HA_DEVICE_MANUFACTURER", "ZKTeco")
 HA_DEVICE_SW_VERSION = "zkt_mqtt_bridge_2.2"
 TIME_ZONE = os.getenv("TIME_ZONE", "UTC")
+STATE_FILE_PATH = os.getenv("STATE_FILE_PATH", "state.json")

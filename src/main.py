@@ -16,6 +16,7 @@ from ha_integration import discovery as ha_discovery
 from scheduler.jobs import JobScheduler
 from mqtt.publisher import MQTTPublisher
 from core.models import DeviceDefinition
+from core.state_manager import StateManager
 
 numeric_level = getattr(logging, settings.LOG_LEVEL)
 logging.basicConfig(level=numeric_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -68,7 +69,8 @@ def main():
         ha_discovery.publish_discovery_messages(mqtt_client, device_definition, device_identifier)
         
         publisher = MQTTPublisher(mqtt_client, serial_number)
-        job_scheduler = JobScheduler(publisher)
+        state_manager = StateManager(settings.STATE_FILE_PATH)
+        job_scheduler = JobScheduler(publisher, state_manager)
         
         job_scheduler.initialize_states(device_definition)
         

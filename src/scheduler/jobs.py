@@ -3,7 +3,7 @@ import logging
 from zkt import handler as zkt_handler
 from core.event_processor import process_event, get_related_entity_states
 from mqtt.publisher import MQTTPublisher
-from core.state_manager import state_manager
+from core.state_manager import StateManager
 from core.models import EntityState
 from c3.rtlog import EventRecord
 from datetime import datetime
@@ -12,8 +12,9 @@ import pytz
 log = logging.getLogger(__name__)
 
 class JobScheduler:   
-    def __init__(self, publisher: MQTTPublisher):
+    def __init__(self, publisher: MQTTPublisher, state_manager: StateManager):
         self.publisher = publisher
+        self.state_manager = state_manager
     
     def polling_job(self):
         log.info("--- Running Polling Job ---")
@@ -39,8 +40,8 @@ class JobScheduler:
     def _process_single_event(self, raw_event: EventRecord):
         self._update_state(raw_event)
 
-        last_event = state_manager.get_last_event()
-        all_states = state_manager.get_states()
+        last_event = self.state_manager.get_last_event()
+        all_states = self.state_manager.get_states()
         entity_states = [
             EntityState(entity_id=entity_id, state=state) for entity_id, state in all_states.items()
         ]
@@ -56,17 +57,17 @@ class JobScheduler:
                 log.warning(f"Failed to process event: {raw_event}")
                 return
 
-            state_manager.update_last_event(processed_event)
+            self.state_manager.update_last_event(processed_event)
             related_states = get_related_entity_states(processed_event)
             for state in related_states:
-                state_manager.update_state(state.entity_id, state.state)
+                self.state_manager.update_state(state.entity_id, state.state)
         except Exception as e:
             log.exception(f"Error processing event: {e}")
     
     def initialize_states(self, device_definition):
         log.info("--- Initializing Entity States ---")
         
-        states = state_manager.initialize_from_device(device_definition)
+        states = self.state_manager.initialize_from_device(device_definition)
         self.publisher.publish_entity_states(states)
         
         log.info(f"Published initial state for {len(states)} entities")

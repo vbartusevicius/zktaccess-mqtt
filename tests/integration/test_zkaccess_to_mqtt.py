@@ -1,13 +1,13 @@
 import pytest
 import json
 import logging
-import datetime
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock
 
 from mqtt.publisher import MQTTPublisher
 from scheduler.jobs import JobScheduler
 from core.models import DeviceDefinition
 from c3.consts import EventType as C3EventType, VerificationMode
+from core.state_manager import StateManager
 import settings
 
 from tests.mocks.c3 import MockC3
@@ -24,7 +24,8 @@ class TestZKAccessToMQTT:
     def setup_test_environment(self, mock_c3):
         mqtt_client = MagicMock()
         publisher = MQTTPublisher(mqtt_client, mock_c3.serial_number)
-        job_scheduler = JobScheduler(publisher)
+        state_manager = StateManager(settings.STATE_FILE_PATH)
+        job_scheduler = JobScheduler(publisher, state_manager)
         
         return (job_scheduler, publisher, mqtt_client, mock_c3)
     

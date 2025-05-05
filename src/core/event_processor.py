@@ -39,21 +39,17 @@ def map_zk_event_to_ha_type(event) -> EventType:
     ]:
         return EventType.DOOR_OPEN
     
-    # Door closing events
     elif event_type == C3EventType.DOOR_CLOSED_CORRECT:
         return EventType.DOOR_CLOSE
     
-    # Door button event
     elif event_type == C3EventType.EXIT_BUTTON_OPEN:
         return EventType.DOOR_BUTTON
     
-    # Aux input events
     elif event_type == C3EventType.AUX_INPUT_DISCONNECT:
         return EventType.AUX_INPUT_DISCONNECTED
     elif event_type == C3EventType.AUX_INPUT_SHORT:
         return EventType.AUX_INPUT_CONNECTED
     
-    # Card scan events
     elif event_type in [C3EventType.NORMAL_PUNCH_OPEN, C3EventType.PUNCH_NORMAL_OPEN_TZ] and verification == VerificationMode.CARD:
         return EventType.CARD_SCAN_SUCCESS
     elif event_type in [
@@ -69,17 +65,14 @@ def map_zk_event_to_ha_type(event) -> EventType:
     elif event_type == C3EventType.UNREGISTERED_CARD:
         return EventType.CARD_SCAN_INVALID
     
-    # PIN events
     elif event_type in [C3EventType.PASSWORD_ERROR, C3EventType.DURESS_PASSWORD_OPEN]:
         return EventType.PIN_DENIED
     
-    # Fingerprint events
     elif event_type in [C3EventType.FP_EXPIRED, C3EventType.DURESS_FP_OPEN]:
         return EventType.FINGERPRINT_DENIED
     elif event_type == C3EventType.UNREGISTERED_FP:
         return EventType.FINGERPRINT_INVALID
     
-    # Multi-purpose events based on verification mode
     elif verification == VerificationMode.CARD:
         return EventType.CARD_SCAN_SUCCESS
     elif verification == VerificationMode.PASSWORD:
@@ -260,13 +253,11 @@ def get_related_entity_states(event: ProcessedEvent) -> List[EntityState]:
             
         payload_json = json.dumps({k: v for k, v in event_payload.items() if v is not None})
         
-        # Update card state
         states.append(EntityState(
             entity_id=f"reader_{event.reader_id}_card",
             state=payload_json
         ))
         
-        # Update scan state
         states.append(EntityState(
             entity_id=f"reader_{event.reader_id}_scan",
             state=payload_json
